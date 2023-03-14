@@ -3,7 +3,7 @@
 Neste repositório você pode encontrar exercícios e atividades relacionadas a matéria de Programação em Banco de Dados. 
 
 
-![](https://github.com/luanamayumi4/free_images/blob/40a17d771977c5f8c5ead12376c1aba49a86479b/bd.gif)
+![This is a image of a database](https://github.com/luanamayumi4/free_images/blob/40a17d771977c5f8c5ead12376c1aba49a86479b/bd.gif)
 
 
 **Linguagem:** SQL
