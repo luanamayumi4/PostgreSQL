@@ -48,7 +48,7 @@ def menu():
         elif opcao ==3:
             login = input("Digite seu login\n")
             senha = input("Digite sua senha\n")
-            novoUsuario = Usuario(login,senha)
+            novo_usuario = Usuario(login,senha)
             print("Novo usuário OK!" if existe(novoUsuario) else "Novo usuário NOK!")
         
     else:
