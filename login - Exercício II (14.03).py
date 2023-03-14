@@ -49,18 +49,16 @@ def menu():
             login = input("Digite seu login\n")
             senha = input("Digite sua senha\n")
             novo_usuario = Usuario(login,senha)
-            print("Novo usuário OK!" if existe(novoUsuario) else "Novo usuário NOK!")
+            print("Novo usuário OK!" if existe(novo_usuario) else "Novo usuário NOK!")
         
     else:
         print("Até mais")
 
     opcao = int(input(texto))
 
+# chamamos a conexão via rowcount
+
 
 # chamamos a função menu
-menu()
-
-        
-    
-            
- 
+menu()     
+  
