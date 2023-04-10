@@ -20,9 +20,7 @@ CALL CONTA (100,50):
 
 -- procedure no mundo real, como se fossemos adicionar em uma tabela "curso" já existente
 
-CREATE PROCEDURE CAD_CURSO(P_NOME VARCHAR(30),
-		                       P_HORAS INT(30),
-                           P_PRECO FLOAT(10,2))
+CREATE PROCEDURE CAD_CURSO(P_NOME VARCHAR(30), P_HORAS INT(30),P_PRECO FLOAT(10,2))
 LANGUAGE plpgsql
 AS $$
 BEGIN
@@ -37,7 +35,7 @@ CALL CAD_CURSO('POWER BI', 20, 3.000.00)
 
 -- procedure de sql (geralmente para evitar sql injection)
 
-xxxxx
+adicionar exemplo depois
 
 --exemplo criado em aula
 
