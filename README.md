@@ -5,6 +5,9 @@ Neste repositório você pode encontrar exercícios e atividades relacionadas a 
 
 ![This is a image of a database](https://github.com/luanamayumi4/free_images/blob/c9f100a153abfbe53bbd36d276b168764e2b290d/database.jpg)
 
+<img src = "https://github.com/luanamayumi4/free_images/blob/c9f100a153abfbe53bbd36d276b168764e2b290d/database.jpg"
+ width="200px"/>
+
 
 **Linguagem:** SQL, PLpgSQL e Python
 
