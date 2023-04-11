@@ -1,5 +1,6 @@
 -- Stored procedures/blocos nomeados
 Armazenados no banco
+Geralmente ajudam a evitar ataques de SQL Injection
 
 -- Bloco anônimo
 Não fica armazenado, como por exemplo um SELECT
@@ -33,11 +34,7 @@ $$;
 CALL CAD_CURSO('BI SQL', 34, 3.000.00)
 CALL CAD_CURSO('POWER BI', 20, 3.000.00)
 
--- procedure de sql (geralmente para evitar sql injection)
-
-adicionar exemplo depois
-
---exemplo criado em aula
+--exemplo criado em sala de aula
 
 CREATE OR REPLACE PROCEDURE sp_ola_usuario
 (nome VARCHAR(200))
