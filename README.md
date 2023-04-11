@@ -11,6 +11,6 @@ Neste repositório você pode encontrar exercícios e atividades relacionadas a 
 
 **Banco de Dados:** PostgreSQL
 
-**Plataforma de Desenvolvimento:** pgAdmin 4
+**Plataforma de Desenvolvimento:** pgAdmin 4 e Anaconda
 
 **IDE:** Visual Studio Code
