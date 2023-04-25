@@ -1,4 +1,170 @@
---Aula 25/04/23 
+--Aula 25/04/23
+
+CREATE OR REPLACE PROCEDURE sp_obter_notas_para_compor_o_troco (OUT resultadoVARCHAR(500), IN troco INT)
+LANGUAGE plpgsql AS $$
+DECLARE
+	notas200 INT := 0;
+	notas100 INT := 0;
+	notas50 INT := 0;
+	notas20 INT := 0;
+	notas10 INT := 0;
+	notas5 INT := 0;
+	notas2 INT := 0;
+	moedas1 INT := 0;
+BEGIN
+	nota200 := troco / 200;
+	notas100 := troco % 200 / 100;
+	notas50 := troco % 200 % 100 / 50;
+	notas20 := troco % 200 % 100 % 50 / 20;
+	notas10 := troco % 200 % 100 % 50 % 20 / 10;
+	notas5 := troco % 200 % 100 % 50 % 20 % 10 / 5;
+	notas2 := troco % 200 % 100 % 50 % 20 % 10 % 5 / 2;
+	moedas1 := troco % 200 % 100 % 50 % 20 % 10 % 5 % 2 / 1;
+
+
+END;
+$$
+
+--Escrever um bloco anônimo
+--Chama o proc para calcular o valor do pedido 1
+--Chama o proc para calcular o valor do troco quando o valor do pagamento é igual a 100
+--Por fim, ele mostra o total da conta e o valor de troco
+DO $$
+DECLARE
+	p_valor_total INT;
+	p_troco INT;
+	p_valor_a_pagar INT := 100;
+	
+BEGIN
+
+	CALL sp_calcular_valor_de_um_pedido (1, p_valor_total);
+	CALL sp_calcular_troco(p_valor_total, p_troco, p_valor_a_pagar);
+	RAISE NOTICE 'O valor total da conta deu R$%, você pago com R$%,  seu troco é de R$%', p_valor_total, p_valor_a_pagar, p_troco;
+
+END;
+$$
+
+
+--Calculando o troco
+
+CREATE OR REPLACE PROCEDURE sp_calcular_troco(
+	OUT p_troco INT,
+	IN p_valor_a_pagar INT,
+	IN p_valor_total INT
+)
+LANGUAGE plpgsql AS $$
+BEGIN
+	p_troco := p_valor_a_pagar - p_valor_total;
+END;
+$$
+
+
+
+
+--O valor está abaixo do necessário
+DO $$
+BEGIN
+	CALL sp_fechar_pedido(20, 1);
+END;
+$$
+
+-- O pedido está sendo fechado
+CREATE OR REPLACE PROCEDURE sp_fechar_pedido(
+	IN p_valor_a_pagar INT,
+	IN p_cod_pedido INT
+)
+LANGUAGE plpgsql AS $$
+DECLARE
+
+	valor_total INT;
+	
+BEGIN
+
+CALL sp_calcular_valor_de_um_pedido(
+	p_codigo_pedido,
+	valor_total
+);
+	IF p_valor_a_pagar < valor_total THEN
+		RAISE 'R$% é insuficiente par apagar a conta de R$', p_valor_a_pagar, valor_total;
+	ELSE
+		UPDATE tb_pedido p SET
+			data_moficacao = CURRENT_TIMESTAMP,
+			status = 'fechado'
+			WHERE p.cod_pedido = $2;
+	END IF;
+
+END;
+$$
+
+
+
+
+--Calculando o valor total do pedido
+DO $$
+DECLARE
+	valor_total INT;
+BEGIN
+	CALL sp_calcular_valor_de_um_pedido(1, valor_total);
+	RAISE NOTICE 'Total do pedido %: R$%', 1, valor_total;
+
+END;
+$$
+
+
+
+--Calculando valor de um pedido
+CREATE OR REPLACE PROCEDURE
+sp_calcular_valor_de_um_pedido(
+	IN p_cod_pedido INT,
+	OUT p_valor_total INT
+)
+LANGUAGE plpgsql AS $$
+BEGIN
+	SELECT 
+		--p.cod_pedido, i.cod_item, i.valor
+		SUM(i.valor)
+	FROM
+		tb_pedido p
+			INNER JOIN
+		tb_item_pedido ip
+			ON p.cod_pedido = ip.cod_pedido
+			INNER JOIN
+		tb_item i
+			ON ip.cod_item = i.cod_item
+		WHERE p.cod_pedido = p_cod_pedido
+		INTO $2;
+END;
+$$
+
+
+
+
+
+CALL sp_adicionar_item_a_pedido(1,1)
+CALL sp_adicionar_item_a_pedido(1,1)
+CALL sp_adicionar_item_a_pedido(2,1)
+
+
+
+SELECT 
+	p.cod_pedido, i.cod_item, i.valor
+FROM
+	tb_pedido p
+		INNER JOIN
+	tb_item_pedido ip
+		ON p.cod_pedido = ip.cod_pedido
+		INNER JOIN
+	tb_item i
+		ON ip.cod_item = i.cod_item;
+
+--
+CALL sp_adicionar_item_a_pedido(1, 1);
+SELECT * FROM tb_item_pedido;
+SELECT * FROM tb_pedido;
+SELECT * FROM tb_item;
+
+
+
 --adicionar um item a um pedido
 CREATE or REPLACE PROCEDURE sp_adicionar_item_a_pedido(
 	IN p_cod_item INT,
@@ -21,23 +187,25 @@ $$
 
 
 
--- DO $$
--- DECLARE
--- 	cod_pedido INT;
--- 	cod_cliente INT;
--- BEGIN
--- 	SELECT c.cod_cliente FROM tb_cliente c WHERE nome LIKE 'João da Silva' INTO cod_cliente;
--- 	CALL sp_criar_pedido(cod_pedido, cod_cliente);
--- 	RAISE NOTICE 'Código do pedido recém criado: %', cod_pedido;
--- END;
--- $$
+DO $$
+DECLARE
+	cod_pedido INT;
+	cod_cliente INT;
+BEGIN
+	SELECT c.cod_cliente FROM tb_cliente c WHERE nome LIKE 'João da Silva' INTO cod_cliente;
+	CALL sp_criar_pedido(cod_pedido, cod_cliente);
+	RAISE NOTICE 'Código do pedido recém criado: %', cod_pedido;
+END;
+$$
 
 
 -- SELECT * FROM tb_cliente;
 
--- CALL sp_cadastrar_cliente('João da Silva');
--- CALL sp_cadastrar_cliente('Maria Santos');
--- SELECT * FROM tb_cliente;
+CALL sp_cadastrar_cliente('João da Silva');
+CALL sp_cadastrar_cliente('Maria Santos');
+
+
+SELECT * FROM tb_cliente;
 
 
 
@@ -159,126 +327,5 @@ BEGIN
 		media := media + valor;
 	END LOOP;
 	RAISE NOTICE 'A média é: %', media / array_length(valores, 1);
-END;
-$$
-
-CREATE OR REPLACE PROCEDURE sp_calcular_valor_de_um_pedido (IN p_cod_pedido INT, OUT valor_total INT)
-LANGUAGE plpgsql
-AS $$
-BEGIN
-	SELECT SUM(valor) FROM
-		tb_pedido p
-		INNER JOIN tb_item_pedido ip ON
-		p.cod_pedido = ip.cod_pedido
-		INNER JOIN tb_item i ON
-		i.cod_item = ip.cod_item
-		WHERE p.cod_pedido = $1
-		INTO $2;
-END;
-$$
-
-DO $$
-DECLARE
-	valor_total INT;
-BEGIN
-	CALL sp_calcular_valor_de_um_pedido(1, valor_total);
-	RAISE NOTICE 'Total do pedido %: R$%', 1, valor_total;
-END;
-$$
-
-DO $$
-BEGIN
-	CALL sp_
-	
--- fechar pedido
-
-CREATE OR REPLACE PROCEDURE sp_fechar_pedido (IN valor_a_pagar INT, IN
-cod_pedido INT)
-LANGUAGE plpgsql
-AS $$
-DECLARE
-	valor_total INT;
-BEGIN
-	--vamos verificar se o valor_a_pagar é suficiente
-		CALL sp_calcular_valor_de_um_pedido (cod_pedido, valor_total);
-		IF valor_a_pagar < valor_total THEN
-			RAISE 'R$% insuficiente para pagar a conta de R$%', valor_a_pagar,
-valor_total;
-	ELSE
-			UPDATE tb_pedido p SET
-			data_modificacao = CURRENT_TIMESTAMP,
-			status = 'fechado'
-			WHERE p.cod_pedido = $2;
-	END IF;
-END;
-$$
-
-DO $$
-BEGIN
-	CALL sp_fechar_pedido(200, 1);
-END;
-$$
-
-SELECT * FROM tb_pedido;
-
-
--- cálculo do troco
-
-CREATE OR REPLACE PROCEDURE sp_calcular_troco (
-	OUT troco INT, 
-	IN valor_a_pagar INT, 
-	IN valor_total INT
-)LANGUAGE plpgsql AS $$ 
-BEGIN 
-	troco := valor_a_pagar - valor_total;
-END;
-$$
-
--- escrever um bloquinho anônimo
--- chama o proc para calcular o valor do pedido 
--- chama o proc para calcular o valor do troco quando o valor do pg é igual a 100
--- por fim, ele mostra o total da conta e o valor de troco
-
-DO $$
-
-DECLARE
-troco INT;
-valor_total INT;
-valor_a_pagar INT := 100;
-
-BEGIN
-	CALL sp_calcular_valor_de_um_pedido(1, valor_total);
-	CALL sp_calcular_troco (troco, valor_a_pagar, valor_total);
-	RAISE NOTICE 'A conta foi de R$% e você pagou %, portanto, seu troco é de R$%.',valor_total, valor_a_pagar, troco;
-END;
-$$
-
--- calcular as notas a serem utilizadas para compor um determinado valor de troco.
-
-CREATE OR REPLACE PROCEDURE sp_obter_notas_para_compor_o_troco (OUT resultado
-VARCHAR(500), IN troco INT)
-LANGUAGE plpgsql 
-AS $$
-DECLARE
-
-	notas200 INT := 0;
-	notas100 INT := 0;
-	notas50 INT := 0;
-	notas20 INT := 0;
-	notas10 INT := 0;
-	notas5 INT := 0;
-	notas2 INT := 0;
-	moedas1 INT := 0;
-	
-BEGIN
-	notas200 := troco / 200;
-	notas100 :=%200 / 100;
-	notas50 :=%200 %100 / 50;
-	notas20 :=%200 %100 %50 / 20;
-	notas10 :=%200 %100 %50 %20 / 10;
-	notas5 :=%200 %100 %50 %20 %10 / 5;
-	notas2 :=%200 %100 %50 %20 %10 %5 / 2;
-	moedas1:=%200 %100 %50 %20 %10 %2 / 1;
-	
 END;
 $$
