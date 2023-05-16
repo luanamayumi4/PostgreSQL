@@ -51,3 +51,5 @@ $$
 
 --FOUND -> variável booleana
 --FETCH -> percorre a tupla, pode ser até mesmo alguma que já tenha passado anteriormente
+
+--15.05
